@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./node_modules/_bootstrap@3.4.1@bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="./css/public.css">
+    <link rel="stylesheet" href="./css/log.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <table class="table table-hover">
+        <tr>
+            <td>药品编号</td>
+            <td>药品名称</td>
+            <td>操作</td>
+            <td>操作人</td>
+            <td>日期</td>
+        </tr>
+        <!-- 表单内容 -->
+        <tbody id="list"></tbody>
+    </table>
+</body>
+</html>
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        //记录当前页面信息
+        localStorage.setItem("url", "log.html");
+        render();
+    })
+    function render() {
+        //从数据库获取用户列表
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "./php/getLog.php",
+            data: {},
+            success: function (res) {
+                // console.log(res);
+                // console.log(typeof (res));
+                var data = res;
+                var str = '';
+                // 注意：输出的i与obj分别为下标与单个的对象
+                $.each(data, function (i, obj) {
+                    // console.log(i);
+                    // console.log(obj);
+                    str += '<tr>';
+                    str += '<td class="medid">' + obj.medid + '</td>';
+                    str += '<td class="medid">' + obj.medid + '</td>';
+                    str += '<td class="type">' + obj.action + '</td>';
+                    str += '<td class="price">' + obj.person + '</td>';
+                    str += '<td class="medname">' + obj.date + '</td>';
+                    str += '</tr>';
+                });
+                $("#list").append(str);
+            }
+        });
+    }
+</script>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./node_modules/_bootstrap@3.4.1@bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="./css//public.css">
+    <link rel="stylesheet" href="./css/userNew.css">
+    <title></title>
+</head>
+
+<body>
+    <table class="table table-hover">
+        <tr>
+            <td>用户ID</td>
+            <td>用户名</td>
+            <td>性别</td>
+            <td>年龄</td>
+            <td>身份</td>
+            <td>联系方式</td>
+            <td>操作</td>
+            <td>
+                <input type="text" id="search" onblur="search()">
+            </td>
+        </tr>
+        <!-- 表单内容 -->
+        <tbody id="list"></tbody>
+        <tbody id="list01"></tbody>
+    </table>
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <div style="display: flex;">
+                        <h4 class="modal-title" id="myModalLabel" style="width:10%">修改</h4>
+                        <span class="tips" style="color: red;font-size: 14px;line-height: 1.7;"></span>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <form action="" class="form-horizontal">
+                        <div class="row form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">用户ID</label>
+                            <div class="col-sm-8">
+                                <input type="text" disabled class="form-control" id="userIdModal" placeholder="001">
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">用户名</label>
+                            <div class="col-sm-8">
+                                <input type="text" disabled class="form-control" id="userNameModal"
+                                    placeholder="请输入用户名">
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">性别</label>
+                            <div class="col-sm-3">
+                                <label class="radio-inline">
+                                    <input type="radio" name="sex" id="sexModal" value="男" /> 男
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="sex" id="sexModal" value="女" /> 女
+                                </label>
+                            </div>
+                            <label for="inputEmail3" class="col-sm-2 control-label">年龄</label>
+                            <div class="col-sm-3">
+                                <input type="number" min="0" max="99" class="form-control" id="ageModal"
+                                    placeholder="请输入年龄">
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">身份</label>
+                            <div class="col-sm-3">
+                                <select class="form-control" disabled>
+                                    <option value="admin">管理员</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">联系方式</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="userTelModal" placeholder="请输入联系方式">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-primary save">提交更改</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+</body>
+
+</html>
+<script src="./node_modules/_jquery@3.4.1@jquery/dist/jquery.js"></script>
+<script src="./node_modules/_bootstrap@3.4.1@bootstrap/dist/js/bootstrap.js"></script>
+<script>
+    $(document).ready(function () {
+        //记录当前页面信息
+        localStorage.setItem("url", "userNew.html");
+        render();
+    })
+    //点击修改时，获取当前行的信息
+    $("body").on('click', ".change", function () {
+        var userid = $(this).parents("tr").find(".userid").text();
+        var username = $(this).parents("tr").find(".username").text();
+        var sexCheck = $(this).parents("tr").find(".sex").text();
+        var age = $(this).parents("tr").find(".age").text();
+        var ident = $(this).parents("tr").find(".ident").text();
+        var userTel = $(this).parents("tr").find(".userTel").text();
+        $("#userIdModal").val(userid);
+        $("#userNameModal").val(username);
+        robj = $("input[name=sex]");
+        for (var i = 0; i < robj.length; i++) {
+            if (robj.eq(i).val() == sexCheck) {
+                // console.log(robj[i].value)
+                robj[i].checked = true;
+            }
+        }
+        $("#ageModal").val(age);
+        $("#userTelModal").val(userTel);
+    })
+    //点击模态框的确定时，提交修改信息
+    $(".save").click(function () {
+        if ($("#ageModal").val().length != 0 && $("#userTelModal").val().length != 0) {
+            var changeSex = $("#myModal input[name='sex']:checked").val();
+            var changeAge = $("#ageModal").val();
+            var changeTel = $("#userTelModal").val();
+            var userid = $("#userIdModal").val();
+            console.log(userid);
+            $(".save").attr('data-dismiss','modal')
+            $.ajax({
+                type: "POST",
+                url: "./php/changeUser.php",
+                data: {
+                    userid,
+                    changeSex,
+                    changeAge,
+                    changeTel
+                },
+                success: function (msg) {
+                    if (msg == 1) {
+                        alert("修改成功");
+                        refresh()
+                    }
+                }
+            });
+        } else {
+            $(".tips").html("请将信息填写完整")
+        }
+    })
+    //删除当前信息行
+    $("body").on('click', ".remove", function () {
+        if (confirm("确认要删除？")) {
+            var userid = $(this).parents("tr").find(".userid").text();
+            console.log(userid)
+            $.ajax({
+                type: "POST",
+                url: "./php/removeUser.php",
+                data: {
+                    userid
+                },
+                success: function (msg) {
+                    if (msg == 1) {
+                        alert("删除成功！")
+                        refresh()
+                    }
+                }
+            })
+        }
+    })
+
+    //搜索
+    search = () => {
+        var str = this.$("#search").val();
+        console.log(str);
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "./php/searchUser.php",
+            data: {
+                str
+            },
+            success: function (msg) {
+                // console.log(msg)
+                var data = msg;
+                var str = '';
+                // 注意：输出的i与obj分别为下标与单个的对象
+                $.each(data, function (i, obj) {
+                    // console.log(i);
+                    // console.log(obj);
+                    str += '<tr>';
+                    str += '<td class="userid">' + obj.userid + '</td>';
+                    str += '<td class="username">' + obj.username + '</td>';
+                    str += '<td class="sex">' + obj.sex + '</td>';
+                    str += '<td class="age">' + obj.age + '</td>';
+                    str += '<td class="ident">' + obj.ident + '</td>';
+                    str += '<td class="userTel">' + obj.userTel + '</td>';
+                    str += '<td><button type="button" class="btn btn-info change" data-toggle="modal" data-target="#myModal">修改</button><button type="button" class="btn btn-default remove">删除</button></td>';
+                    str += '</tr>';
+                });
+                $("#list").remove();
+                $("#list01 tr").each(function (index, el) {
+                    if (index > 1) {
+                        $(this).remove();
+                    }
+                })
+                $("#list01").append(str);
+            }
+        })
+    }
+    //刷新页面
+    function refresh() {
+        window.location.reload();//刷新当前页面
+    }
+    //渲染内容
+    function render() {
+        //从数据库获取用户列表
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "./php/getUser.php",
+            data: {},
+            success: function (res) {
+                console.log(res);
+                console.log(typeof (res));
+                var data = res;
+                var str = '';
+                // 注意：输出的i与obj分别为下标与单个的对象
+                $.each(data, function (i, obj) {
+                    // console.log(i);
+                    // console.log(obj);
+                    str += '<tr>';
+                    str += '<td class="userid">' + obj.userid + '</td>';
+                    str += '<td class="username">' + obj.username + '</td>';
+                    str += '<td class="sex">' + obj.sex + '</td>';
+                    str += '<td class="age">' + obj.age + '</td>';
+                    str += '<td class="ident">' + obj.ident + '</td>';
+                    str += '<td class="userTel">' + obj.userTel + '</td>';
+                    str += '<td><button type="button" class="btn btn-info change" data-toggle="modal" data-target="#myModal">修改</button><button type="button" class="btn btn-default remove">删除</button></td>';
+                    str += '</tr>';
+                });
+                $("#list").append(str);
+            }
+        });
+    }
+</script>

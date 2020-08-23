@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./node_modules/_bootstrap@3.4.1@bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="./css//public.css">
+    <link rel="stylesheet" href="./css//userAdd.css">
+    <title>用户增加</title>
+</head>
+
+<body>
+    <form action="" class="form-horizontal">
+        <div class="row form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label">用户ID</label>
+            <div class="col-sm-6">
+                <div class="input-group">
+                    <div class="input-group-addon">U</div>
+                    <input type="text" class="form-control" id="userid">
+                </div>
+            </div>
+        </div>
+        <div class="row form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label">用户名</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="username" placeholder="请输入用户名">
+            </div>
+        </div>
+        <div class="row form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label">性别</label>
+            <div class="col-sm-2">
+                <label class="radio-inline">
+                    <input type="radio" name="sex" id="inlineRadio1" value="男" checked> 男
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="sex" id="inlineRadio2" value="女"> 女
+                </label>
+            </div>
+            <label for="inputEmail3" class="col-sm-2 control-label">年龄</label>
+            <div class="col-sm-2">
+                <input type="number" min="0" max="99" class="form-control" id="userAge" placeholder="请输入年龄">
+            </div>
+        </div>
+        <div class="row form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label">身份</label>
+            <div class="col-sm-3">
+                <select class="form-control" disabled>
+                    <option value="admin">管理员</option>
+                </select>
+            </div>
+        </div>
+        <div class="row form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label">联系方式</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" id="contact" placeholder="请输入联系方式">
+            </div>
+        </div>
+        <div class="row btns form-group">
+            <div class="col-sm-10">
+                <button type="button" class="btn btn-info" onclick="save()">保存</button>
+                <button type="reset" class="btn btn-default">取消</button>
+            </div>
+        </div>
+    </form>
+</body>
+
+</html>
+<script src="./node_modules/_jquery@3.4.1@jquery/dist/jquery.js"></script>
+<script>
+    $(document).ready(function () {
+        //记录当前页面信息
+        localStorage.setItem("url", "userAdd.html");
+    });
+    function save() {
+        if ($("#userid").val().length!=0 && $("#username").val().length!=0 &&  $("#userAge").val().length!=0 && $("#contact").val().length!=0) {
+        var userid = "U" + $("#userid").val();
+        var username = $("#username").val();
+        var sex = $("input[name='sex']:checked").val();
+        var age = $("#userAge").val();
+        var userTel = $("#contact").val();
+            $.ajax({
+                type: "POST",
+                url: "./php/saveUser.php",
+                data: {
+                    userid,
+                    username,
+                    sex,
+                    age,
+                    userTel
+                },
+                success: function (msg) {
+                    if (msg == 1) {
+                        alert("添加成功！");
+                        $("div input").val('');
+                    } else if (msg == -1) {
+                        alert("该ID已被使用，请重新设置！");
+                    } else if (msg == 0) {
+                        alert("注册失败，请重试");
+                    }
+                }
+            });
+        } else {
+            alert("请将信息填写完整")
+        }
+    }
+</script>

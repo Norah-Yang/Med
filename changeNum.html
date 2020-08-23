@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" style="margin: 30px;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./node_modules/_bootstrap@3.4.1@bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="./css//public.css">
+    <link rel="stylesheet" href="./css/userNew.css">
+    <title></title>
+</head>
+
+<body>
+    当前日期：<span id="date"></span>
+    <div class="main" style="margin-top: 40px;">
+        <table class="table table-hover">
+            <tr>
+                <td>药品编号</td>
+                <td>药品名</td>
+                <td>药品数量</td>
+                <td>操作</td>
+            </tr>
+            <!-- 表单内容 -->
+            <tbody id="list"></tbody>
+        </table>
+        <!-- 模态框（Modal） -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel">修改</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form action="" class="form-horizontal">
+                            <div class="row form-group">
+                                <label for="inputEmail3" class="col-sm-2 control-label">药品编号</label>
+                                <div class="col-sm-8">
+                                    <div class="input-group">
+                                        <div class="input-group-addon">M</div>
+                                        <input type="text" disabled class="form-control" id="medidModal">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <label for="inputEmail3" class="col-sm-2 control-label">药品名称</label>
+                                <div class="col-sm-8">
+                                    <input type="text" disabled class="form-control" id="mednameModal">
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <label for="inputEmail3" class="col-sm-2 control-label">药品类别</label>
+                                <div class="col-sm-3">
+                                    <select class="form-control" id="medtypeModal">
+                                        <option value="抗菌消炎类">抗菌消炎类</option>
+                                        <option value="胃肠道类">胃肠道类</option>
+                                        <option value="维生素与矿物质类">维生素与矿物质类</option>
+                                        <option value="心脑血管类">心脑血管类</option>
+                                        <option value="妇科类">妇科类</option>
+                                        <option value="五官科类">五官科类</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <label for="inputEmail3" class="col-sm-2 control-label">药品价格</label>
+                                <div class="col-sm-3">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="priceModal">
+                                        <div class="input-group-addon">￥</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary" onclick="change()">提交更改</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+    </div>
+</body>
+
+</html>
+<script src="./node_modules/_jquery@3.4.1@jquery/dist/jquery.js"></script>
+<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="./js/log.js"></script>
+<script>
+    $(document).ready(function () {
+        //记录当前页面信息
+        localStorage.setItem("url", "changeNum.html");
+        render();
+        var odate = new Date();
+        var year = odate.getFullYear();  //获取年
+        var month = odate.getMonth() + 1;  //获取月
+        var date = odate.getDate();  //获取日
+        var detail = year + '-' + month + '-' + date;
+        $("#date").html(detail)
+
+    })
+    //修改当前数据
+    $("body").on('click', ".change", function () {
+        var mednum = window.prompt('请输入修改后的数量', '');
+        var medid = $(this).parents("tr").find(".medid").text();
+        // console.log(medid+mednum)
+        if (mednum == "" || mednum == null||isNaN(mednum)||mednum<0) {
+            alert("您输入有误或取消输入");
+        } else {
+        // console.log(medid+mednum)
+            
+            $.ajax({
+                type: "POST",
+                url: "./php/changeNum.php",
+                data: {
+                    medid,
+                    mednum
+                },
+                success: function (msg) {
+                    // console.log(msg);
+                    if (msg == 1) {
+                        alert("修改成功");
+                        refresh()
+                    }
+                }
+            });
+        }
+    })
+    //刷新页面
+    function refresh() {
+        window.location.reload();//刷新当前页面
+    }
+    //渲染内容
+    function render() {
+        //从数据库获取用户列表
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "./php/getNum.php",
+            data: {},
+            success: function (res) {
+                // console.log(res);
+                // console.log(typeof (res));
+                var data = res;
+                var str = '';
+                // 注意：输出的i与obj分别为下标与单个的对象
+                $.each(data, function (i, obj) {
+                    // console.log(i);
+                    // console.log(obj);
+                    str += '<tr>';
+                    str += '<td class="medid">' + obj.medid + '</td>';
+                    str += '<td class="medname">' + obj.medname + '</td>';
+                    str += '<td class="type">' + obj.mednum + '</td>';
+                    str += '<td class="btn"><button class="btn btn-info change">修改数量</button></td>';
+                    str += '</tr>';
+                });
+                $("#list").append(str);
+            }
+        });
+    }
+</script>

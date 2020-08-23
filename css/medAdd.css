@@ -1,0 +1,13 @@
+html{
+    margin: 30px;
+}
+.main{
+    margin-top: 40px;
+}
+.btns{
+    text-align: center;
+    margin-top: 50px;
+}
+.btns .btn{
+    width: 100px;
+}

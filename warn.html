@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./node_modules/_bootstrap@3.4.1@bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="./css//public.css">
+    <link rel="stylesheet" href="./css/userNew.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <h3>缺货信息</h3>
+    <div class="main" style="margin-top: 40px;">
+        <table class="table table-hover">
+            <tr>
+                <td>药品编号</td>
+                <td>药品名</td>
+                <td>药品类型</td>
+                <td>药品价格</td>
+                <td>药品数量</td>
+            </tr>
+            <!-- 表单内容 -->
+            <tbody id="list"></tbody>
+        </table>
+    </div>
+</body>
+
+</html>
+<script src="./node_modules/_jquery@3.4.1@jquery/dist/jquery.js"></script>
+<script>
+    $(document).ready(function () {
+        //记录当前页面信息
+        localStorage.setItem("url", "warn.html");
+        render();
+        var odate = new Date();
+        var year = odate.getFullYear();  //获取年
+        var month = odate.getMonth() + 1;  //获取月
+        var date = odate.getDate();  //获取日
+        var detail = year + '-' + month + '-' + date;
+        $("#date").html(detail)
+
+    })
+    //渲染内容
+    function render() {
+        //从数据库获取用户列表
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "./php/warn.php",
+            data: {},
+            success: function (res) {
+                // console.log(res);
+                // console.log(typeof (res));
+                var data = res;
+                var str = '';
+                var txt = res.length;
+                parent.GetChildValue(txt); //GetValue是父界面的Js 方法
+                // 注意：输出的i与obj分别为下标与单个的对象
+                $.each(data, function (i, obj) {
+                    // console.log(i);
+                    // console.log(obj);
+                    str += '<tr>';
+                    str += '<td class="medid">' + obj.medid + '</td>';
+                    str += '<td class="medname">' + obj.medname + '</td>';
+                    str += '<td class="type">' + obj.type + '</td>';
+                    str += '<td class="price">' + obj.price + '￥</td>';
+                    str += '<td class="mednum">' + obj.mednum + '</td>';
+                    str += '</tr>';
+                });
+                $("#list").append(str);
+            }
+        });
+    }
+    // var txt = '我是子界面主动传值给父界面的数值';
+    // parent.GetChildValue(txt); //GetValue是父界面的Js 方法
+    //刷新页面
+    function refresh() {
+        window.location.reload();//刷新当前页面
+    }
+</script>

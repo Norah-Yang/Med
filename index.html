@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>首页</title>
+	<link rel="stylesheet" href="./node_modules/_layui-src@2.5.5@layui-src/dist/css/layui.css">
+	<link rel="stylesheet" href="./css/index.css">
+	<link rel="stylesheet" href="./css/public.css">
+</head>
+
+<body class="layui-layout-body">
+	<div class="layui-layout layui-layout-admin">
+		<div class="layui-header">
+			<div class="layui-logo">药品管理系统</div>
+			<ul class="layui-nav layui-layout-right">
+				<li class="layui-nav-item">
+					<a href="javascript:;" id="info">
+
+					</a>
+				</li>
+				<li class="layui-nav-item"><a href="#" onclick="logout()">退出</a></li>
+			</ul>
+		</div>
+
+		<div class="layui-side layui-bg-black">
+			<div class="layui-side-scroll">
+				<!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+				<ul class="layui-nav layui-nav-tree" lay-filter="test">
+					<li class="layui-nav-item layui-nav-itemed">
+						<a class="" href="javascript:;">用户管理</a>
+						<dl class="layui-nav-child">
+							<dd><a href="./userAdd.html">用户增加</a></dd>
+							<dd><a href="./userNew.html">用户删改</a></dd>
+						</dl>
+					</li>
+					<li class="layui-nav-item">
+						<a href="javascript:;">药品信息管理</a>
+						<dl class="layui-nav-child">
+							<dd><a href="medAdd.html">药品信息添加</a></dd>
+							<dd><a href="medNew.html">药品信息删改</a></dd>
+						</dl>
+					</li>
+					<li class="layui-nav-item">
+						<a href="javascript:;">药品入库管理</a>
+						<dl class="layui-nav-child">
+							<dd><a href="log.html">记录查看</a></dd>
+						</dl>
+					</li>
+					<li class="layui-nav-item">
+						<a href="javascript:;">药品库存管理</a>
+						<dl class="layui-nav-child">
+							<dd><a href="changeNum.html">库存修改</a></dd>
+						</dl>
+					</li>
+					<li class="layui-nav-item"><a href="warn.html" class="warn">缺货警告<span
+								class="layui-badge"></span></a></li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="layui-body">
+			<!-- 内容主体区域 -->
+			<iframe id="iframeMain" src="./userAdd.html" style="width: 100%" ; height="100%" ;></iframe>
+		</div>
+
+	</div>
+
+</body>
+
+</html>
+<script src="./node_modules/_layui-src@2.5.5@layui-src/dist/layui.js"></script>
+<script src="./node_modules/_jquery@3.4.1@jquery/dist/jquery.js"></script>
+<script>
+	//JavaScript代码区域
+	layui.use('element', function () {
+		var element = layui.element;
+	});
+	$(document).ready(function () {
+		//获取本地登陆信息
+		var info = localStorage.getItem("username");
+		$("#info").html(info)  //将登陆信息渲染至页面
+		//iframe的跳转
+		$("dd>a,.warn").click(function (e) {
+			e.preventDefault();
+			$("#iframeMain").attr("src", $(this).attr("href"));
+		});
+		//获取当前主体页面信息
+		var url = localStorage.getItem("url");
+		if (url) {
+			$("#iframeMain").attr('src', url)
+		} else {
+			$("#iframeMain").attr('src', "userAdd.html")
+		}
+		$.ajax({
+			type: "POST",
+		    dataType: "json",
+		    url: "./php/warn.php",
+		    data: {},
+		    success: function (res) {
+				var sub = res.length;
+				$(".layui-badge").html(sub)
+		        // console.log(res.length);
+		    }
+		})
+
+	});
+	function GetChildValue(obj) {
+		$(".layui-badge").html(obj)
+		// console.log(obj)
+	}
+	//退出登录
+	function logout() {
+		window.localStorage.removeItem("username");
+		window.localStorage.removeItem("url");
+		window.location.href = "login.html"
+	}
+</script>

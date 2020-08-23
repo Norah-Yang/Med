@@ -1,0 +1,21 @@
+html{
+  margin: 70px;
+}
+.table>tbody>tr>td{
+    vertical-align: middle;
+}
+#search{
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  text-indent: 10px;
+  outline: none;
+}
+.tip_text{
+  display: flex;
+}
+.tip_text h4{
+  width: 20%;
+}
+.tips{
+  color: red;
+}
